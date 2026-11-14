@@ -13,4 +13,6 @@ public interface OrderRepository extends JpaRepository<TradeOrder, Long> {
     List<TradeOrder> findBySellerIdOrderByIdDesc(Long sellerId);
     List<TradeOrder> findTop5ByOrderByIdDesc();
     long countByStatusAndFinishTimeGreaterThanEqual(String status, LocalDateTime finishTime);
+    long countByStatus(String status);
+    List<TradeOrder> findByStatusAndFinishTimeGreaterThanEqual(String status, LocalDateTime finishTime);
 }

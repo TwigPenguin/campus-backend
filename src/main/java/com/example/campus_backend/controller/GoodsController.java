@@ -64,7 +64,9 @@ public class GoodsController {
         return Result.success(goodsService.updateStatus(
                 ParamUtil.asLong(body.get("id")),
                 ParamUtil.asText(body.get("status")),
-                ParamUtil.asText(body.get("role"))
+                ParamUtil.asText(body.get("role")),
+                ParamUtil.asLong(body.get("adminId")),
+                ParamUtil.asText(body.get("adminName"))
         ));
     }
 
@@ -82,13 +84,5 @@ public class GoodsController {
                 ParamUtil.asLong(body.get("id")),
                 ParamUtil.asLong(body.get("sellerId"))
         ));
-    }
-
-    @GetMapping("/add-test")
-    public Result<Goods> addTest() {
-        Goods testGoods = new Goods(null, "数据库里的二手商品", 99.9, 199.9, "全新", "图书馆服务台",
-                "测试员", "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800&q=80",
-                "digital", "这是一个测试描述", "待审核");
-        return Result.success(goodsService.addGoods(testGoods));
     }
 }

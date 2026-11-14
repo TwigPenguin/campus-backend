@@ -48,7 +48,14 @@ public class OrderService {
             throw new IllegalArgumentException("不能购买自己发布的物品");
         }
 
-        goods.setStatus("已售出");
+        int stock = goods.getStock() == null ? 1 : goods.getStock();
+        if (stock <= 0) {
+            throw new IllegalArgumentException("商品库存不足");
+        }
+        goods.setStock(stock - 1);
+        if (stock - 1 <= 0) {
+            goods.setStatus("已售出");
+        }
         goodsRepository.save(goods);
 
         TradeOrder order = new TradeOrder();
@@ -95,10 +102,12 @@ public class OrderService {
         order.setStatus("已取消");
         TradeOrder saved = orderRepository.save(order);
         goodsRepository.findById(order.getGoodsId()).ifPresent(goods -> {
+            int stock = goods.getStock() == null ? 0 : goods.getStock();
+            goods.setStock(stock + 1);
             if ("已售出".equals(goods.getStatus())) {
                 goods.setStatus("已上架");
-                goodsRepository.save(goods);
             }
+            goodsRepository.save(goods);
         });
         messageService.send(order.getSellerId(), "买家取消了「" + order.getGoodsTitle() + "」的订单，物品已重新上架。");
         return saved;

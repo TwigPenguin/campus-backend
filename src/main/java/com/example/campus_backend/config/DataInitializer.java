@@ -2,8 +2,10 @@ package com.example.campus_backend.config;
 
 import com.example.campus_backend.common.PasswordUtil;
 import com.example.campus_backend.entity.Goods;
+import com.example.campus_backend.entity.PickupPoint;
 import com.example.campus_backend.entity.User;
 import com.example.campus_backend.repository.GoodsRepository;
+import com.example.campus_backend.repository.PickupPointRepository;
 import com.example.campus_backend.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,8 +26,12 @@ public class DataInitializer implements CommandLineRunner {
     @Autowired
     private GoodsRepository goodsRepository;
 
+    @Autowired
+    private PickupPointRepository pickupPointRepository;
+
     @Override
     public void run(String... args) {
+        seedPickupPoints();
         if (userRepository.count() > 0) {
             return;
         }
@@ -34,6 +40,23 @@ public class DataInitializer implements CommandLineRunner {
         User wang = saveUser("2021002", "123456", "王同学", "USER");
         seedGoods(li, wang);
         log.info("演示账号已就绪：同学 2021001 / 123456 ，管理员 admin / admin123");
+    }
+
+    private void seedPickupPoints() {
+        if (pickupPointRepository.count() > 0) {
+            return;
+        }
+        addPickupPoint("图书馆服务台", "图书馆一楼总服务台，营业时间内均可自提", "启用");
+        addPickupPoint("北区宿舍管处", "北区宿舍楼管办公室门口", "启用");
+        addPickupPoint("南区食堂门口", "南区食堂正门左侧自提柜", "启用");
+    }
+
+    private void addPickupPoint(String name, String description, String status) {
+        PickupPoint point = new PickupPoint();
+        point.setName(name);
+        point.setDescription(description);
+        point.setStatus(status);
+        pickupPointRepository.save(point);
     }
 
     private User saveUser(String username, String password, String nickname, String role) {

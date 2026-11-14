@@ -31,6 +31,9 @@ public class User {
     /** USER 或 ADMIN */
     private String role;
 
+    /** 正常 或 封禁 */
+    private String status;
+
     private LocalDateTime createTime;
 
     @PrePersist
@@ -40,6 +43,9 @@ public class User {
         }
         if (role == null || role.isBlank()) {
             role = "USER";
+        }
+        if (status == null || status.isBlank()) {
+            status = "正常";
         }
     }
 
@@ -57,6 +63,9 @@ public class User {
 
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }
+
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 
     public LocalDateTime getCreateTime() { return createTime; }
     public void setCreateTime(LocalDateTime createTime) { this.createTime = createTime; }

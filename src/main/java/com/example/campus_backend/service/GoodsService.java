@@ -32,6 +32,9 @@ public class GoodsService {
     @Autowired
     private MessageService messageService;
 
+    @Autowired
+    private SysLogService sysLogService;
+
     public PageResult<Goods> search(String keyword, String category, String sort, int page, int size) {
         if (keyword != null) {
             keyword = keyword.trim();
@@ -111,18 +114,17 @@ public class GoodsService {
         goods.setSeller(CampusText.displayName(seller));
         goods.setStatus("待审核");
         goods.setCreateTime(LocalDateTime.now());
+        if (goods.getStock() == null || goods.getStock() < 1) {
+            goods.setStock(1);
+        }
         if (goods.getImage() == null || goods.getImage().isBlank()) {
             goods.setImage(defaultImage(goods.getCategory()));
         }
         return goodsRepository.save(goods);
     }
 
-    public Goods addGoods(Goods goods) {
-        return goodsRepository.save(goods);
-    }
-
     @Transactional
-    public Goods updateStatus(Long id, String status, String role) {
+    public Goods updateStatus(Long id, String status, String role, Long adminId, String adminName) {
         if (!"ADMIN".equals(role)) {
             throw new IllegalArgumentException("只有管理员可以审核");
         }
@@ -138,8 +140,10 @@ public class GoodsService {
         Goods saved = goodsRepository.save(goods);
         if ("已上架".equals(status)) {
             messageService.send(saved.getSellerId(), "你发布的「" + saved.getTitle() + "」已通过审核，现在可以在首页看到。");
+            sysLogService.record(adminId, adminName, "审核通过", "物品「" + saved.getTitle() + "」");
         } else {
             messageService.send(saved.getSellerId(), "你发布的「" + saved.getTitle() + "」未通过审核，可在个人中心修改后重新提交。");
+            sysLogService.record(adminId, adminName, "审核驳回", "物品「" + saved.getTitle() + "」");
         }
         return saved;
     }

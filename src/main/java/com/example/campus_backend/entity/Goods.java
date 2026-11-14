@@ -39,6 +39,9 @@ public class Goods {
     /** 待审核、已上架、已驳回、已下架、已售出 */
     private String status;
 
+    /** 库存数量，默认 1 */
+    private Integer stock;
+
     private LocalDateTime createTime;
 
     public Goods() {}
@@ -65,6 +68,9 @@ public class Goods {
         }
         if (status == null || status.isBlank()) {
             status = "待审核";
+        }
+        if (stock == null || stock < 0) {
+            stock = 1;
         }
     }
 
@@ -106,6 +112,9 @@ public class Goods {
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+
+    public Integer getStock() { return stock; }
+    public void setStock(Integer stock) { this.stock = stock; }
 
     public LocalDateTime getCreateTime() { return createTime; }
     public void setCreateTime(LocalDateTime createTime) { this.createTime = createTime; }

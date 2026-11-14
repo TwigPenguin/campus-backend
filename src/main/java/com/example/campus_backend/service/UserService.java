@@ -48,6 +48,9 @@ public class UserService {
         if (!PasswordUtil.hash(password).equals(user.getPassword())) {
             throw new IllegalArgumentException("学号或密码错误");
         }
+        if ("封禁".equals(user.getStatus())) {
+            throw new IllegalArgumentException("该账号已被封禁，请联系管理员");
+        }
         return user;
     }
 }
