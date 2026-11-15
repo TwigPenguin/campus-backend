@@ -72,9 +72,29 @@ public class ComplaintService {
         }
         Complaint complaint = complaintRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("投诉记录不存在"));
+        
+        // 1. 更新投诉状态为已处理
         complaint.setStatus("已处理");
         complaint.setHandleResult(result == null ? "" : result.trim());
         complaint.setHandleTime(LocalDateTime.now());
-        return complaintRepository.save(complaint);
+        Complaint savedComplaint = complaintRepository.save(complaint);
+
+        // ================= 新增：封禁违规卖家逻辑 =================
+        // 如果这条投诉关联了商品，我们就把这个商品的卖家封禁
+        if (savedComplaint.getGoodsId() != null) {
+            // 找到被举报的商品
+            goodsRepository.findById(savedComplaint.getGoodsId()).ifPresent(goods -> {
+                if (goods.getSellerId() != null) {
+                    // 找到卖家，并将其状态修改为“封禁”
+                    userRepository.findById(goods.getSellerId()).ifPresent(seller -> {
+                        seller.setStatus("封禁");
+                        userRepository.save(seller);
+                    });
+                }
+            });
+        }
+        // ==========================================================
+
+        return savedComplaint;
     }
 }
