@@ -39,6 +39,10 @@ public class OrderService {
         }
         User buyer = userRepository.findById(buyerId)
                 .orElseThrow(() -> new IllegalArgumentException("请先登录"));
+
+        if ("封禁".equals(buyer.getStatus())) {
+            throw new IllegalArgumentException("您的账号已被封禁，无法购买物品");
+        }
         Goods goods = goodsRepository.findById(goodsId)
                 .orElseThrow(() -> new IllegalArgumentException("商品不存在"));
         if (!"已上架".equals(goods.getStatus())) {

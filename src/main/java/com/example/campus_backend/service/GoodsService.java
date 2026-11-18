@@ -83,6 +83,10 @@ public class GoodsService {
         }
         User seller = userRepository.findById(goods.getSellerId())
                 .orElseThrow(() -> new IllegalArgumentException("用户不存在，请重新登录"));
+
+        if ("封禁".equals(seller.getStatus())) {
+            throw new IllegalArgumentException("您的账号已被封禁，无法发布物品");
+        }
         String title = goods.getTitle() == null ? "" : goods.getTitle().trim();
         if (title.isEmpty() || title.length() > 50) {
             throw new IllegalArgumentException("物品名称需要在 1 到 50 字之间");
